@@ -5,6 +5,7 @@ import { withRouter } from "react-router-dom";
 import axios from "axios";
 import ReactS3 from "react-s3";
 import industriesData from "../../industry.json";
+import ReactDatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
 class BlogPostCard extends React.Component {
@@ -21,6 +22,7 @@ class BlogPostCard extends React.Component {
       metaDescription: "",
       imageFile: null,
       imageUrl: "",
+      scheduledDate: null,
     };
   }
 
@@ -35,10 +37,9 @@ class BlogPostCard extends React.Component {
       const file = event.target.files[0];
 
       if (file) {
-        const maxFileSize = 100 * 1024; // 100KB in bytes
+        const maxFileSize = 100 * 1024;
 
         if (file.size <= maxFileSize) {
-          // Upload the image to AWS S3
           const config = {
             bucketName: "mif-bucket",
             region: "ap-south-1",
@@ -63,10 +64,20 @@ class BlogPostCard extends React.Component {
     }
   };
 
+  handleDateChange = (date) => {
+    this.setState({ scheduledDate: date });
+  };
+
   postData = async () => {
     try {
-      const { description, keyword, selectedIndustry, slug, imageUrl } =
-        this.state;
+      const {
+        description,
+        keyword,
+        selectedIndustry,
+        slug,
+        imageUrl,
+        scheduledDate,
+      } = this.state;
 
       const blogTitle = document.getElementById("blogTitle").value;
       const category = document.getElementById("categorySelect").value;
@@ -83,6 +94,7 @@ class BlogPostCard extends React.Component {
         slug: slug,
         image: imageUrl,
         metaDescription: metaDescription,
+        scheduledDate: scheduledDate,
       };
 
       const response = await axios.post(
@@ -160,7 +172,19 @@ class BlogPostCard extends React.Component {
               ))}
             </select>
           </div>
-
+          <div className="form-group">
+            <label>Schedule Date & time:</label>
+            <ReactDatePicker
+              selected={this.state.scheduledDate}
+              onChange={this.handleDateChange}
+              showTimeSelect
+              timeFormat="HH:mm"
+              timeIntervals={5}
+              dateFormat="MMMM d, yyyy h:mm aa"
+              placeholderText="Select date and time"
+              className="form-control"
+            />
+          </div>
           <div className="form-group">
             <input
               type="text"

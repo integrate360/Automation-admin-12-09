@@ -4,6 +4,8 @@ import { connect } from "react-redux";
 import { withRouter } from "react-router-dom";
 import DynamicMetaTags from "../../utils/DynamicMetaTags";
 import { FaSortUp, FaSortDown } from "react-icons/fa";
+import { FaTrash } from "react-icons/fa";
+
 
 class BlogListCard extends React.Component {
   static counter = 1; // Initialize the static counter to 1
@@ -15,7 +17,10 @@ class BlogListCard extends React.Component {
     };
     BlogListCard.counter++; // Increment the static counter for the next instance
   }
-  
+  handleDeleteClick = (postId) => {
+    this.props.onDeleteClick(postId);
+  };
+
   handleCLick = (postId) => {
     this.props.history.push(`/blogdetails/${postId}`);
   };
@@ -54,19 +59,20 @@ class BlogListCard extends React.Component {
       <>
         <tbody className="danger">
           <tr>
-            <td >{serial}</td>
-            <td >{HeaderText}</td>
+            <td>{serial}</td>
+            <td>{HeaderText}</td>
             <td>{category}</td>
             <td>{formatDate(createdAt)}</td>
             <td>
-              <button
-                className="btn btn-outline-secondary"
-                onClick={() => {
-                  this.handleCLick(postId);
-                }}
-              >
-                Read More
-              </button>
+              <a href={`/blogdetails/${postId}`}>Read More</a>
+              <span style={{ marginLeft: "10px" }}>
+                <FaTrash
+                  onClick={() => {
+                    this.handleDeleteClick(postId);
+                  }}
+                  className="delete-icon"
+                />
+              </span>
             </td>
           </tr>
         </tbody>

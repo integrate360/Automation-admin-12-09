@@ -37,7 +37,9 @@ class BlogList extends React.Component {
 
   loadBlogPosts = (page) => {
     axios
-      .get(`${process.env.REACT_APP_API_URL}/api/post/posts/allposts?page=${page}`)
+      .get(
+        `${process.env.REACT_APP_API_URL}/api/post/posts/allposts?page=${page}`
+      )
       .then((response) => {
         this.setState({
           blogListCardData: response.data.posts,
@@ -66,6 +68,21 @@ class BlogList extends React.Component {
   // Handle pagination button clicks
   handlePageClick = (page) => {
     this.loadBlogPosts(page);
+  };
+
+  handleDeleteBlog = (postId) => {
+    axios
+      .delete(`${process.env.REACT_APP_API_URL}/api/post/delete/${postId}`)
+      .then((response) => {
+        if (response.status === 200) {
+          this.loadBlogPosts(this.state.currentPage);
+        } else {
+          console.log("Failed to delete the blog post.");
+        }
+      })
+      .catch(() => {
+        console.log("Error");
+      });
   };
 
   calculatePaginationRange = () => {
@@ -148,7 +165,7 @@ class BlogList extends React.Component {
                           <h4>Published Date</h4>
                         </th>
                         <th>
-                          <h4>Read More</h4>
+                          <h4>Actions</h4>
                         </th>
                       </tr>
                     </thead>
@@ -164,12 +181,16 @@ class BlogList extends React.Component {
                           createdAt={data.createdAt}
                           postId={data._id}
                           blogs={blogListCardData}
+                          onDeleteClick={this.handleDeleteBlog}
                         />
                       );
                     })}
                   </table>
                 </div>
-                <div className="pagination" style={{justifyContent:"space-evenly"}}>
+                <div
+                  className="pagination"
+                  style={{ justifyContent: "space-evenly" }}
+                >
                   <button
                     onClick={
                       () => this.handlePageClick(currentPage - 1) // Previous page button
